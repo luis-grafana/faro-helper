@@ -17,10 +17,7 @@ Everything is configured at runtime from the toolbar popup. There is no build st
 - [What Apply actually does](#what-apply-actually-does)
 - [Session replay](#session-replay)
 - [Architecture](#architecture)
-- [The timing requirement](#the-timing-requirement)
-- [Troubleshooting](#troubleshooting)
-- [Design decisions](#design-decisions)
-- [Maintenance](#maintenance)
+- [Support](#support)
 
 ---
 
