@@ -11,6 +11,8 @@ Everything is configured at runtime from the toolbar popup. There is no build st
 ## Contents
 
 - [Install](#install)
+  - [Option 1 · Chrome Web Store (request access)](#option-1--chrome-web-store-request-access)
+  - [Option 2 · Manual install (local, unpacked)](#option-2--manual-install-local-unpacked)
 - [Usage](#usage)
 - [What Apply actually does](#what-apply-actually-does)
 - [Session replay](#session-replay)
@@ -24,12 +26,51 @@ Everything is configured at runtime from the toolbar popup. There is no build st
 
 ## Install
 
-Not on the Chrome Web Store — load it unpacked:
+Two options: request access to the published Chrome Web Store listing, or install the folder manually.
+
+### Option 1 · Chrome Web Store (request access)
+
+The extension **is** published on the Chrome Web Store, but the listing is private — it is not publicly searchable and cannot be installed directly. Access is granted per person.
+
+1. **Request access** using this form: **[Faro Helper — access request form](https://forms.gle/REPLACE-ME)**
+2. Once your request is approved, you'll receive a **one-click installation link** from the Chrome Web Store
+3. Open the link and choose **Add to Chrome**
+
+This is the recommended route: installation is one click, and updates arrive automatically through the Web Store.
+
+### Option 2 · Manual install (local, unpacked)
+
+Use this if you'd rather not wait for access, or you want to run modified code.
+
+Download this repository first — either `git clone`, or **Code → Download ZIP** and unzip it. The folder you select below must be the one containing `manifest.json`.
+
+> **Works on any Chromium-based browser** — Google Chrome, Microsoft Edge, Brave, Vivaldi, Opera, Arc, and others. The two most common are covered below; the steps on any other Chromium browser are the same, just at that browser's own extensions page.
+
+#### Google Chrome
 
 1. Open `chrome://extensions`
-2. Enable **Developer mode** (top right)
-3. **Load unpacked** → select this folder
-4. Pin the extension so the popup is one click away
+2. Turn on **Developer mode** (toggle, top right)
+3. Click **Load unpacked**
+4. Select the folder containing `manifest.json`
+5. Pin **Grafana Faro Helper** from the toolbar's extensions (🧩) menu so the popup is one click away
+
+#### Microsoft Edge
+
+1. Open `edge://extensions`
+2. Turn on **Developer mode** (toggle, bottom left)
+3. Click **Load unpacked**
+4. Select the folder containing `manifest.json`
+5. Pin it from the toolbar's extensions menu
+
+> Edge may warn that the extension isn't from the Microsoft Store — expected for a manually loaded extension, and safe to accept here.
+
+#### Other Chromium browsers
+
+Same three steps at the browser's own extensions page — e.g. `brave://extensions`, `vivaldi://extensions`, `opera://extensions` — then **Developer mode** → **Load unpacked**.
+
+> **Note on manual installs:** the extension will not auto-update, so re-download and reload it to get changes. Some browsers also show a "disable developer mode extensions" prompt on each restart; that's normal for unpacked extensions.
+
+### After installing (either option)
 
 The popup opens empty. The extension holds **no** site access until you add a profile and click Apply — the manifest declares host permissions as *optional*, requested per-site at runtime.
 
@@ -287,7 +328,9 @@ curl -sL "$b/faro-instrumentation-replay@$v/dist/bundle/faro-instrumentation-rep
 
 Verify a bundle is really the version you think it is by **byte comparison** against the CDN, not by grepping for a version string — the minified bundles embed their *dependencies'* versions (OpenTelemetry, rrweb), which is misleading.
 
-### Packaging for the Chrome Web Store
+### Packaging a release
+
+Bump `version` in `manifest.json` first, then:
 
 ```bash
 V=$(python3 -c "import json;print(json.load(open('manifest.json'))['version'])")
@@ -295,13 +338,7 @@ rm -f "faro-helper-${V}.zip"
 zip -rq "faro-helper-${V}.zip" . -x '.git/*' '.gitignore' 'README.md' '*.zip' '.DS_Store' '*/.DS_Store'
 ```
 
-`manifest.json` must sit at the **archive root**, not inside a nested folder — the most common upload rejection.
-
-Store-submission notes:
-
-- **Remote code: No.** All executable code is packaged. The service worker's `fetch()` reads CSP *headers* and posts telemetry; it never fetches code.
-- **Data disclosure:** the injected SDK collects **Web history** (page URLs/timings) and **User activity** (network monitoring via tracing). Enabling session replay additionally records **Website content** (page DOM).
-- **Icons:** the manifest declares only `128`. Adding `16`/`32`/`48` avoids Chrome downscaling a blurry toolbar icon.
+`manifest.json` must sit at the **archive root**, not inside a nested folder.
 
 ---
 
