@@ -1,6 +1,6 @@
 # Grafana Faro Helper
 
-A Chrome extension that injects the [Grafana Faro](https://grafana.com/docs/grafana-cloud/monitor-applications/frontend-observability/) web SDK into any site you choose, so you can capture front-end telemetry — Web Vitals, errors, traces, and optionally session replay — from sites you don't control the source of.
+A Chrome extension that injects the [Grafana Faro](https://grafana.com/docs/grafana-cloud/monitor-applications/frontend-observability/) web SDK into any site you choose, so you can capture front-end telemetry (Web Vitals, errors, traces, and optionally session replay) from sites you don't control the source of.
 
 Most production sites send a `Content-Security-Policy` header that blocks scripts from a `chrome-extension:` origin and blocks network calls to a telemetry collector. This extension patches that policy at the network layer so the SDK can run, then injects and initialises it early enough to capture real metrics.
 
@@ -30,9 +30,9 @@ Two options: request access to the published Chrome Web Store listing, or instal
 
 ### Option 1 · Chrome Web Store (request access)
 
-The extension **is** published on the Chrome Web Store, but the listing is private — it is not publicly searchable and cannot be installed directly. Access is granted per person.
+The extension **is** published on the Chrome Web Store, but the listing is private. It is not publicly searchable. Access is granted per person.
 
-1. **Request access** using this form: **[Faro Helper — access request form](https://forms.gle/Vro6Q7eDpeFYbebT8)**
+1. **Request access** using this form: **[Faro Helper | Access Request Form](https://forms.gle/Vro6Q7eDpeFYbebT8)**
 2. Once your request is approved, you'll receive a **one-click installation link** from the Chrome Web Store
 3. Open the link and choose **Add to Chrome**
 
@@ -42,7 +42,7 @@ This is the recommended route: installation is one click, and updates arrive aut
 
 Use this if you'd rather not wait for access, or you want to run modified code.
 
-Download this repository first — either `git clone`, or **Code → Download ZIP** and unzip it. The folder you select below must be the one containing `manifest.json`.
+Download this repository first, either `git clone`, or **Code → Download ZIP** and unzip it. The folder you select below must be the one containing `manifest.json`.
 
 > **Works on any Chromium-based browser** — Google Chrome, Microsoft Edge, Brave, Vivaldi, Opera, Arc, and others. The two most common are covered below; the steps on any other Chromium browser are the same, just at that browser's own extensions page.
 
@@ -62,17 +62,17 @@ Download this repository first — either `git clone`, or **Code → Download ZI
 4. Select the folder containing `manifest.json`
 5. Pin it from the toolbar's extensions menu
 
-> Edge may warn that the extension isn't from the Microsoft Store — expected for a manually loaded extension, and safe to accept here.
+> Edge may warn that the extension isn't from the Microsoft Store (expected for a manually loaded extension, and safe to accept here).
 
 #### Other Chromium browsers
 
-Same three steps at the browser's own extensions page — e.g. `brave://extensions`, `vivaldi://extensions`, `opera://extensions` — then **Developer mode** → **Load unpacked**.
+Same three steps at the browser's own extensions page, e.g. `brave://extensions`, `vivaldi://extensions`, `opera://extensions` — then **Developer mode** → **Load unpacked**.
 
 > **Note on manual installs:** the extension will not auto-update, so re-download and reload it to get changes. Some browsers also show a "disable developer mode extensions" prompt on each restart; that's normal for unpacked extensions.
 
 ### After installing (either option)
 
-The popup opens empty. The extension holds **no** site access until you add a profile and click Apply — the manifest declares host permissions as *optional*, requested per-site at runtime.
+The popup opens empty. The extension holds **no** site access until you add a profile and click Apply, the manifest declares host permissions as *optional*, requested per-site at runtime.
 
 ---
 
@@ -98,14 +98,14 @@ Standard [Chrome match patterns](https://developer.chrome.com/docs/extensions/de
 | Field | Notes |
 |---|---|
 | **Faro endpoint URL** | Any collector — Grafana Cloud (`…grafana.net/collect/<key>`) or a self-hosted/custom domain. Its **origin** is what gets added to `connect-src`. |
-| **App name / Version / Environment** | Passed straight to `initializeFaro` as `app.*`. Nothing is pre-filled — a default here would silently ship as real telemetry metadata. |
+| **App name / Version / Environment** | Passed straight to `initializeFaro` as `app.*`. Nothing is pre-filled, a default here would silently ship as real telemetry metadata. |
 | **Enable session replay** | Off by default. See [Session replay](#session-replay). |
 
 ### 3 · Turn it on, then Apply
 
 Tick **On**, click **Apply**, accept Chrome's permission prompt, then reload the page.
 
-Apply is the only action that changes browser state. Editing fields just autosaves — the **Apply** button and **Reload tabs** checkbox only appear when there is something pending, and that pending state survives the popup closing.
+Apply is the only action that changes browser state. Editing fields just autosaves, the **Apply** button and **Reload tabs** checkbox only appear when there is something pending, and that pending state survives the popup closing.
 
 **Access is handled for you.** There is no Grant/Revoke button:
 
@@ -122,7 +122,7 @@ Apply is the only action that changes browser state. Editing fields just autosav
 For each enabled profile, Apply:
 
 1. **Fetches the live page** and reads its real `content-security-policy` response header.
-2. **Patches that policy additively** — only ever adding tokens, never removing:
+2. **Patches that policy additively** only ever adding tokens, never removing:
 
    | Directive | Token | Why |
    |---|---|---|
@@ -130,7 +130,7 @@ For each enabled profile, Apply:
    | `connect-src` | the collector's **origin** | So beacons can be sent. Only the origin — never the `/collect/<key>` path, which would be an invalid CSP source and would leak the app key into a response header. |
    | `worker-src` | `blob:` | **Replay only.** The recorder starts a Web Worker from a Blob URL. |
 
-3. **Installs it** as a `declarativeNetRequest` dynamic rule — one rule per match pattern, scoped to that pattern, on `main_frame` + `sub_frame`.
+3. **Installs it** as a `declarativeNetRequest` dynamic rule, one rule per match pattern, scoped to that pattern, on `main_frame` + `sub_frame`.
 4. **Registers the content scripts** for that profile.
 5. **Reports what it changed**, so you see the actual edit rather than a claim of success.
 
@@ -138,7 +138,7 @@ For each enabled profile, Apply:
 
 ## Session replay
 
-Optional, per profile, **off by default** — it records the page DOM (text, form inputs, images) via rrweb, which is far more than the metric/error/trace telemetry the base SDK sends.
+Optional, per profile, **off by default** it records the page DOM (text, form inputs, images) via rrweb, which is far more than the metric/error/trace telemetry the base SDK sends.
 
 When enabled, `faro-instrumentation-replay.iife.js` is injected and registered:
 
@@ -148,7 +148,7 @@ faro.instrumentations.add(new GrafanaFaroInstrumentationReplay.ReplayInstrumenta
 
 ### It also has to be enabled on the Grafana side
 
-Session Replay is a **public-preview add-on**, enabled per Grafana Cloud *stack* — there is no self-serve toggle in the Grafana UI. You submit Grafana's [enablement form](https://grafana.com/docs/grafana-cloud/observe-and-act/monitor-applications/session-replay/) listing your stacks.
+Session Replay is a **public-preview add-on**, enabled per Grafana Cloud *stack*. There is no self-serve toggle in the Grafana UI. You submit Grafana's [enablement form](https://grafana.com/docs/grafana-cloud/observe-and-act/monitor-applications/session-replay/) listing your stacks.
 
 Until that is done, the extension still records and POSTs replay data, but it won't render as playable sessions.
 
@@ -180,4 +180,4 @@ lib/apply.js     fetch → patch → install             │    modifyHeaders ru
 
 ## Support
 
-For issues, requests or feedback please reach out using this form: **[Faro Helper — support form](https://forms.gle/x4vnJ664UeqKxrgo7)**
+For issues, requests or feedback please reach out using this form: **[Faro Helper | Support Form](https://forms.gle/x4vnJ664UeqKxrgo7)**
