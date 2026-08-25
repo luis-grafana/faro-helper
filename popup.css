@@ -1,0 +1,245 @@
+/* Sized for an extension popup. Chrome caps popups at 800x600, so the body is
+   a fixed 780px wide and scrolls internally, with the action bar pinned. The
+   same file also renders acceptably when opened in a full tab via "Open in
+   tab", which is the escape hatch for editing a 4KB CSP comfortably. */
+
+:root {
+  color-scheme: light dark;
+  --bg: #ffffff;
+  --panel: #f9fafb;
+  --border: #e5e7eb;
+  --text: #111827;
+  --muted: #6b7280;
+  --accent: #2563eb;
+  --danger: #dc2626;
+  --ok: #16a34a;
+  --warn: #b45309;
+  --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0b0f19;
+    --panel: #131a29;
+    --border: #263045;
+    --text: #e5e7eb;
+    --muted: #9ca3af;
+    --accent: #60a5fa;
+    --danger: #f87171;
+    --ok: #4ade80;
+    --warn: #fbbf24;
+  }
+}
+
+* { box-sizing: border-box; }
+
+/* The `hidden` attribute must always win. Its effect comes from the user-agent
+   `[hidden] { display: none }` rule, which ANY author `display` declaration (e.g.
+   `.toggle { display: inline-flex }`) silently overrides — so hiding a styled
+   element via the attribute needs this to hold. */
+[hidden] { display: none !important; }
+
+/* Chrome sizes a popup from the document's own preferred width, so it has to be
+   stated explicitly on BOTH html and body, and in absolute units only.
+   Viewport units are a trap here: during the popup's first layout pass the
+   viewport is still unsized, so `max-width: 100vw` resolves to almost nothing,
+   clamps the body, and the popup locks itself to that width. 780px + a
+   scrollbar stays under Chrome's 800px popup cap. */
+html, body { margin: 0; width: 780px; }
+
+body {
+  font: 13px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-width: 780px;
+  min-height: 240px;
+  padding: 12px 14px 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* If popup.html is opened directly in a tab, drop the popup sizing entirely. The
+   query is evaluated against the tab viewport, which is far wider than any popup,
+   so this never fires inside the popup itself. */
+@media (min-width: 820px) {
+  html, body { width: auto; }
+  body { min-width: 0; max-width: 1040px; margin: 0 auto; padding: 20px 20px 0; }
+}
+
+/* Extra top/bottom room so the header isn't crammed against the window edge or the
+   description below it. */
+.page-head { padding: 6px 0 16px; }
+
+h1 { font-size: 15px; margin: 0; }
+
+/* The logo is the full "Faro Helper" wordmark (204x37 viewBox). Cap its height and
+   let width scale so it stays crisp; margin-bottom separates it from the lede. */
+.brand { margin: 0 0 10px; }
+.brand-logo { height: 34px; width: auto; display: block; }
+
+/* The wordmark is black; invert it in dark mode so it stays legible. The orange
+   bars survive the inversion close enough to brand. */
+@media (prefers-color-scheme: dark) {
+  .brand-logo { filter: invert(1) hue-rotate(180deg); }
+}
+
+.lede { color: var(--muted); margin: 0; font-size: 12px; max-width: 60ch; }
+
+/* ---------------------------------------------------------------- profiles */
+
+.profiles { display: flex; flex-direction: column; gap: 10px; }
+
+.card {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--panel);
+  padding: 10px 12px;
+}
+.card.off { opacity: 0.66; }
+.card.collapsed .card-body { display: none; }
+
+.card-head { display: flex; align-items: center; gap: 8px; }
+.card-head .name { flex: 1 1 auto; min-width: 0; font-weight: 600; }
+
+.card-body { display: flex; flex-direction: column; gap: 10px; margin-top: 10px; }
+
+.perm-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.perm { font-size: 11px; padding: 2px 8px; border-radius: 999px; white-space: nowrap; }
+.perm:empty { display: none; }
+.perm.granted { color: var(--ok); border: 1px solid currentColor; }
+.perm.missing { color: var(--warn); border: 1px solid currentColor; }
+.perm.pending { color: var(--muted); border: 1px dashed currentColor; }
+
+/* ------------------------------------------------------------- guided steps */
+
+.step-head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.step-n {
+  display: inline-grid;
+  place-items: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--border);
+  color: var(--text);
+  font-size: 10px;
+  letter-spacing: 0;
+}
+.step-note { margin: 0; font-size: 12px; color: var(--muted); }
+.advanced { margin-top: 8px; }
+.advanced summary {
+  cursor: pointer;
+  font-size: 11px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.advanced summary:hover { color: var(--accent); }
+.advanced > .field { margin-top: 6px; }
+
+/* ------------------------------------------------------------------ fields */
+
+.field { display: flex; flex-direction: column; gap: 4px; }
+.field > label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.03em; color: var(--muted); }
+
+/* Session-replay toggle sits below the Faro fields; give it room and a hairline
+   separator so it doesn't read as part of the block above. */
+.replay-field { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); }
+.hint { display: block; font-weight: 400; text-transform: none; letter-spacing: 0; color: var(--muted); font-size: 11px; }
+.hint code, code { font-family: var(--mono); font-size: 11px; }
+
+.row { display: flex; gap: 6px; flex-wrap: wrap; }
+.row > input { flex: 1 1 110px; min-width: 0; }
+
+input[type="text"], input[type="url"], textarea, select {
+  font: inherit;
+  color: var(--text);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  padding: 5px 7px;
+  width: 100%;
+}
+select { cursor: pointer; }
+textarea { font-family: var(--mono); font-size: 11.5px; resize: vertical; line-height: 1.4; }
+input:focus, textarea:focus, select:focus { outline: 2px solid var(--accent); outline-offset: -1px; border-color: var(--accent); }
+input.invalid, textarea.invalid { border-color: var(--danger); }
+
+.inline-error, .issues { font-size: 11.5px; }
+.inline-error { color: var(--danger); white-space: pre-line; }
+.inline-error:empty { display: none; }
+.issues { display: flex; flex-direction: column; gap: 2px; }
+.issues:empty { display: none; }
+.issue-error { color: var(--danger); }
+.issue-warn { color: var(--warn); }
+
+/* ----------------------------------------------------------------- buttons */
+
+button {
+  font: inherit;
+  border-radius: 5px;
+  padding: 4px 10px;
+  cursor: pointer;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+  white-space: nowrap;
+}
+button:hover { border-color: var(--accent); }
+button:disabled { opacity: 0.5; cursor: default; }
+button.primary { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; }
+button.primary:hover:not(:disabled) { filter: brightness(1.08); }
+button.danger { color: var(--danger); padding: 4px 8px; }
+button.danger:hover { border-color: var(--danger); }
+button.chev { padding: 4px 7px; color: var(--muted); }
+button.link {
+  background: none;
+  border: none;
+  color: var(--accent);
+  padding: 0;
+  font-size: 12px;
+  text-decoration: underline;
+}
+
+.toggle { display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; font-size: 12px; }
+.toggle input { margin: 0; }
+
+/* ------------------------------------------------------------ footer + status */
+
+.empty { color: var(--muted); }
+
+.bar {
+  position: sticky;
+  bottom: 0;
+  margin-top: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 9px 0;
+  background: var(--bg);
+  border-top: 1px solid var(--border);
+}
+.bar-actions { display: flex; align-items: center; gap: 8px; }
+
+.status {
+  margin: 10px 0 0;
+  padding: 8px 11px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--panel);
+  font-size: 12px;
+  white-space: pre-line;
+}
+.status:empty { display: none; }
+.status.ok { border-color: var(--ok); }
+.status.error { border-color: var(--danger); }

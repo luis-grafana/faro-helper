@@ -1,0 +1,26 @@
+{
+  "manifest_version": 3,
+  "name": "Grafana Faro Helper (BETA)",
+  "description": "Inject the Grafana Faro SDK, with optional per-site session replay.",
+  "version": "1.1.0",
+  "permissions": [
+    "declarativeNetRequestWithHostAccess",
+    "scripting",
+    "storage"
+  ],
+  "icons": {
+    "128": "faro_icon.png"
+  },
+  "optional_host_permissions": [
+    "https://*/*",
+    "http://*/*"
+  ],
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "action": {
+    "default_title": "Faro Helper — Replay",
+    "default_popup": "popup.html"
+  }
+}

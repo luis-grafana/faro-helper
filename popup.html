@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Faro Helper</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <header class="page-head">
+      <!-- The logo is the full "Faro Helper" wordmark, so it stands alone as the
+           title — no adjacent text. -->
+      <h1 class="brand">
+        <img class="brand-logo" src="faro_helper_logo.svg" alt="Faro Helper" />
+      </h1>
+      <p class="lede">
+        Edits save as you type. <strong>Apply</strong> pushes them to the browser,
+        requesting or removing site access as needed, then reload the page, not the
+        extension.
+      </p>
+    </header>
+
+    <main id="profiles" class="profiles"></main>
+
+    <p id="empty" class="empty" hidden>
+      No profiles yet. <button type="button" class="link" data-action="add">Add one</button>.
+    </p>
+
+    <template id="profile-template">
+      <section class="card" data-profile>
+        <div class="card-head">
+          <label class="toggle">
+            <input type="checkbox" data-field="enabled" />
+            <span>On</span>
+          </label>
+          <input class="name" type="text" data-field="name" placeholder="Profile name, e.g. www.example.com" />
+          <button type="button" class="chev" data-action="collapse" aria-expanded="true" title="Collapse">▾</button>
+          <button type="button" class="danger" data-action="delete" title="Delete profile">✕</button>
+        </div>
+
+        <div class="card-body" data-body>
+          <div class="issues" data-issues></div>
+
+          <div class="step">
+            <div class="step-head"><span class="step-n">1</span> Where it runs</div>
+            <div class="field">
+              <label>
+                Match patterns
+                <span class="hint">One per line | <code>https://www.example.com/*</code> or <code>*://*.example.com/*</code></span>
+              </label>
+              <textarea rows="2" data-field="matches" spellcheck="false"></textarea>
+              <div class="inline-error" data-matches-error></div>
+              <div class="perm-row">
+                <span class="perm" data-perm></span>
+              </div>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-head"><span class="step-n">2</span> Where to send the data</div>
+            <div class="field">
+              <label>
+                Faro collector
+                <span class="hint">Faro endpoint URL</span>
+              </label>
+              <input type="url" data-field="faro.collectorUrl" placeholder="https://faro-collector-….grafana.net/collect/…" spellcheck="false" />
+              <div class="row">
+                <input type="text" data-field="faro.appName" placeholder="App name" />
+                <input type="text" data-field="faro.appVersion" placeholder="Version" />
+                <input type="text" data-field="faro.environment" placeholder="Environment" />
+              </div>
+            </div>
+            <div class="field replay-field">
+              <label class="toggle">
+                <input type="checkbox" data-field="replay" />
+                <span>Enable session replay</span>
+              </label>
+              <span class="hint">
+                Records the page DOM (text, form inputs, images) via rrweb, not just
+                metrics/errors. Off by default. Adds <code>worker-src blob:</code> to the CSP
+                automatically.
+              </span>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-head"><span class="step-n">3</span> Turn it on, then Apply</div>
+            <p class="step-note">
+              Tick <strong>On</strong> above and click <strong>Apply</strong>. Site access is
+              requested for you; switching a profile off again removes it.
+            </p>
+            <details class="advanced">
+              <summary>Advanced</summary>
+              <div class="field">
+                <label>
+                  Read the policy from
+                  <span class="hint">
+                    Apply reads this page's CSP and adds only what the SDK needs. Leave blank to
+                    derive it from the first match pattern — only patterns too broad to pin down
+                    need one here.
+                  </span>
+                </label>
+                <input type="url" data-field="testUrl" placeholder="derived from the match pattern" spellcheck="false" />
+              </div>
+            </details>
+          </div>
+        </div>
+      </section>
+    </template>
+
+    <!-- Above the action bar in document order: two elements both sticky to the
+         bottom would fight, and a long summary could push Apply out of view. -->
+    <div id="status" class="status" role="status" aria-live="polite"></div>
+
+    <footer class="bar">
+      <div class="bar-actions">
+        <!-- Hidden until something is edited: freshly opened, there is nothing to apply. -->
+        <button type="button" class="primary" data-action="apply" hidden>Apply</button>
+        <button type="button" class="secondary" data-action="add">Add profile</button>
+      </div>
+      <div class="bar-actions">
+        <!-- Only relevant when there is something to apply, so it tracks Apply's visibility. -->
+        <label id="reload-tabs-label" class="toggle" title="Reload any open tab a profile matches, so you don't have to refresh by hand" hidden>
+          <input type="checkbox" id="reload-tabs" />
+          <span>Reload tabs</span>
+        </label>
+      </div>
+    </footer>
+
+    <script type="module" src="popup.js"></script>
+  </body>
+</html>

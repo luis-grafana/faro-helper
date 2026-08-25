@@ -1,0 +1,8 @@
+# macOS
+.DS_Store
+
+# Chrome writes this when an unpacked extension is loaded
+_metadata/
+
+# Build output
+*.zip
