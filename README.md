@@ -127,7 +127,7 @@ Apply is the only action that changes browser state. Editing fields just autosav
 
 - Profile **On** + no access → Apply requests it
 - Profile **Off** + access held → Apply gives it back
-- **Deleting** a profile revokes its access too — but only origins no remaining profile still needs
+- **Deleting** a profile removes its access too, but only origins no remaining **enabled** profile uses. If another profile shares the host, access is kept and the popup asks you to Apply to clear the deleted profile's leftover rules.
 
 **Reload tabs** reloads matching open tabs so you don't refresh by hand. It applies when switching a profile *off* as well, which is what unloads the SDK and restores the site's own policy.
 
