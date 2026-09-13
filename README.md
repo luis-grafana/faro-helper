@@ -61,7 +61,7 @@ Download this repository first, either `git clone`, or **Code → Download ZIP**
 
 #### Other Chromium browsers
 
-Same three steps at the browser's own extensions page, e.g. `brave://extensions`, `vivaldi://extensions`, `opera://extensions` — then **Developer mode** → **Load unpacked**.
+Same three steps at the browser's own extensions page, e.g. `brave://extensions`, `vivaldi://extensions`, `opera://extensions`, then **Developer mode** → **Load unpacked**.
 
 > **Note on manual installs:** the extension will not auto-update, so re-download and reload it to get changes. Some browsers also show a "disable developer mode extensions" prompt on each restart; that's normal for unpacked extensions.
 
