@@ -2,8 +2,6 @@
 
 A Chrome extension that injects the [Grafana Faro](https://grafana.com/docs/grafana-cloud/monitor-applications/frontend-observability/) web SDK into any site you choose, so you can capture front-end telemetry (Web Vitals, errors, traces, and optionally session replay) from sites you don't control the source of.
 
-Most production sites send a `Content-Security-Policy` header that blocks scripts from a `chrome-extension:` origin and blocks network calls to a telemetry collector. This extension patches that policy at the network layer so the SDK can run, then injects and initialises it early enough to capture real metrics.
-
 Everything is configured at runtime from the toolbar popup. There is no build step, no bundler, and no remotely-hosted code.
 
 ---
