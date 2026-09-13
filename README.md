@@ -79,17 +79,14 @@ There is a small setup on both sides: Grafana and the extension plugin itself:
 
 1.1 In your Grafana Cloud stack go to **Frontend Observability **
 
-1.2 Create a new app or choose an existing one:
-
-1.2.1 If you already have a Frontend app created in Grafana for this test, move to step **1.2.2**. If you are creating a new app follow Frontend app in Grafana, follow the steps below:
-  
-1.2.1.1 Click **New app** and follow the wizard
-1.2.1.2 Add the **Allowed origins**. These are the origins of the sites where you want to test Faro (you do not need to own these domains, the extension will take care of injecting the                                 necessary scripts locally on your browser). **Important**: this steps cannot be skipped, otherwise the scripts injected by the extension will not execute.
-1.2.1.3 As the method to connect your web application choose **Manual**
-1.2.1.4 Further lower on that same page you will see the Faro endpoint. Copy this endpoint you will need to add it to the extension pop-up later. The Faro endpoint is usually a URL starting with `https://faro-collector-...` (if you are hosting your own Faro endpoint, skip this step).
-1.2.1.5 Finish the steps on the wizard to complete the new Frontend app.
-
-1.2.1 If you already have a Frontend app created in Grafana, make sure you have added the correct **Allowed domains** and grab the Faro endpoint from the **Settings** > **Web SDK Config** (if you are hosting your own         Faro endpoint, use your endpoint instead).
+- **1.2** Create a new app or choose an existing one:
+  - **1.2.1** If you already have a Frontend app created in Grafana for this test, move to step **1.2.2**. If you are creating a new Frontend app in Grafana, follow the steps below:
+    - **1.2.1.1** Click **New app** and follow the wizard.
+    - **1.2.1.2** Add the **Allowed origins**. These are the origins of the sites where you want to test Faro (you do not need to own these domains — the extension takes care of injecting the necessary scripts locally in your browser). **Important**: this step cannot be skipped, otherwise the scripts injected by the extension will not execute.
+    - **1.2.1.3** As the method to connect your web application, choose **Manual**.
+    - **1.2.1.4** Further down on that same page you will see the Faro endpoint. Copy it — you will need to add it to the extension pop-up later. The Faro endpoint is usually a URL starting with `https://faro-collector-...` (if you are hosting your own Faro endpoint, skip this step).
+    - **1.2.1.5** Finish the steps in the wizard to complete the new Frontend app.
+  - **1.2.2** If you already have a Frontend app created in Grafana, make sure you have added the correct **Allowed origins** and grab the Faro endpoint from **Settings** > **Web SDK Config** (if you are hosting your own Faro endpoint, use your endpoint instead).
 
 ### 2 · Setup on the Browser extension
 
