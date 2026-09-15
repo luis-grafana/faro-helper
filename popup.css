@@ -171,6 +171,8 @@ input[type="text"], input[type="url"], textarea, select {
 }
 select { cursor: pointer; }
 textarea { font-family: var(--mono); font-size: 11.5px; resize: vertical; line-height: 1.4; }
+/* The match pattern is code, so it keeps the monospace treatment the textarea had. */
+input.pattern { font-family: var(--mono); font-size: 11.5px; }
 input:focus, textarea:focus, select:focus { outline: 2px solid var(--accent); outline-offset: -1px; border-color: var(--accent); }
 input.invalid, textarea.invalid { border-color: var(--danger); }
 

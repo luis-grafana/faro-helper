@@ -214,7 +214,7 @@ function buildCard(profile, expanded) {
   card.querySelector('[data-field="enabled"]').checked = profile.enabled;
   card.querySelector('[data-field="replay"]').checked = profile.replay;
   card.querySelector('[data-field="name"]').value = profile.name;
-  card.querySelector('[data-field="matches"]').value = profile.matches.join('\n');
+  card.querySelector('[data-field="matches"]').value = profile.matches[0] ?? '';
   card.querySelector('[data-field="testUrl"]').value = profile.testUrl;
   card.querySelector('[data-field="faro.collectorUrl"]').value = profile.faro.collectorUrl;
   card.querySelector('[data-field="faro.appName"]').value = profile.faro.appName;
@@ -481,10 +481,11 @@ profilesEl.addEventListener('input', (event) => {
   } else if (field === 'replay') {
     profile.replay = event.target.checked;
   } else if (field === 'matches') {
-    profile.matches = event.target.value
-      .split('\n')
-      .map((line) => line.trim())
-      .filter(Boolean);
+    // One pattern per profile. A profile fetches ONE policy and installs it on every
+    // URL it matches, so a second pattern for an unrelated site would have the first
+    // site's CSP forced onto it — breaking it silently, because that policy does not
+    // allow the second site's own scripts and styles. Separate sites, separate profiles.
+    profile.matches = [event.target.value.trim()].filter(Boolean);
   } else {
     setField(profile, field, event.target.value);
   }
@@ -546,6 +547,25 @@ document.addEventListener('click', (event) => {
 // button like any other edit.
 reloadTabsEl.addEventListener('change', markEdited);
 
+/**
+ * Match patterns dropped by the one-per-profile rule.
+ *
+ * A config stored before that rule existed can hold several patterns on one profile.
+ * Only the first survives normalisation, so the extras are read straight from storage
+ * and reported once: silently discarding a pattern the user typed would leave a site
+ * they expected to be covered quietly uninstrumented.
+ */
+async function droppedPatterns() {
+  try {
+    const raw = (await chrome.storage.local.get('cspInjectConfig')).cspInjectConfig;
+    if (!raw?.profiles) return [];
+    return raw.profiles.flatMap((p) => (Array.isArray(p.matches) ? p.matches.slice(1) : []));
+  } catch {
+    // Nothing readable means nothing to report.
+    return [];
+  }
+}
+
 // ----------------------------------------------------------------------- boot
 
 (async () => {
@@ -563,5 +583,16 @@ reloadTabsEl.addEventListener('change', markEdited);
   // milliseconds, long before a person could reopen the popup, so this cannot race
   // a legitimately pending reload.
   chrome.storage.local.remove(RELOAD_ON_GRANT_KEY);
+
+  const dropped = await droppedPatterns();
+  if (dropped.length > 0) {
+    // Persist the truncation, so this is reported once rather than on every open.
+    await saveNow();
+    setStatus(
+      `One match pattern per profile now — dropped ${dropped.join(', ')}. ` +
+        'Add a separate profile for each site.',
+      'error',
+    );
+  }
   render(await chooseExpanded());
 })();
